@@ -52,7 +52,7 @@ export default function PokemonList() {
                         <p>Pokemon number :  {getIdFromUrl(pokemon.url)}  🍳</p>
                         <div className="card-actions justify-end">
                             <button className="btn btn-primary">
-                                <a href={`/detail/${getIdFromUrl(pokemon.url)}`}>Details</a></button>
+                                <a href={`/client/${getIdFromUrl(pokemon.url)}`}>Details</a></button>
                         </div>
                     </div>
                 </div>
