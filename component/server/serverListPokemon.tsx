@@ -1,46 +1,27 @@
-import React from "react";
+import React from 'react';
 
-interface Pokemon {
-    name: string,
-    url: string
+interface Props {
+    pokemonData: {
+        name: string;
+        url: string;
+    }[];
 }
 
-export default function PokemonList() {
-    const [pokemons, setPokemons] = React.useState<Pokemon[]>([]);
-
-    React.useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const pageNumber = 1;
-                const response = await fetch(`https://pokeapi.co/api/v2/pokemon?limit=50&offset=${(pageNumber - 1) * 50}`);
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                const data = await response.json();
-                const pokemonsData: Pokemon[] = data.results.map((pokemon: any) => ({
-                    name: pokemon.name,
-                    url: pokemon.url
-                }));
-                setPokemons(pokemonsData);
-            } catch (error) {
-                console.error('Error fetching data:', error);
-            }
-        };
-
-        fetchData();
-    }, []);
+export default function SimpleSSRComponent(props: Props) {
+    const { pokemonData } = props;
 
     return (
         <div className="flex flex-wrap justify-center gap-6">
-            {pokemons.map(pokemon => (
+            {pokemonData.map(pokemon => (
                 <div key={pokemon.name} className="card w-96 bg-base-100 shadow-xl image-full">
                     <img src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${getIdFromUrl(pokemon.url)}.png`} alt={pokemon.name} />
                     <div className="card-body">
                         <h2 className="card-title">{pokemon.name}</h2>
-                        <p>Pokemon number :  {getIdFromUrl(pokemon.url)}  🍳</p>
+                        <p>Pokemon number: {getIdFromUrl(pokemon.url)} 🍳</p>
                         <div className="card-actions justify-end">
                             <button className="btn btn-primary">
-                                <a href={`/detail/${getIdFromUrl(pokemon.url)}`}>Details</a></button>
+                                <a href="#">Details</a>
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -49,6 +30,29 @@ export default function PokemonList() {
     );
 }
 
-function getIdFromUrl(url: string): string {
+export async function getServerSideProps() {
+    try {
+        const res = await fetch("https://pokeapi.co/api/v2/pokemon");
+        if (!res.ok) {
+            throw new Error("Failed to fetch data");
+        }
+        const jsonData = await res.json();
+        const pokemonData = jsonData.results;
+        return {
+            props: {
+                pokemonData
+            }
+        };
+    } catch (error) {
+        console.error('Error fetching data:', error);
+        return {
+            props: {
+                pokemonData: []
+            }
+        };
+    }
+}
+
+function getIdFromUrl(url: string) {
     return url.split("/").slice(-2, -1)[0];
 }
