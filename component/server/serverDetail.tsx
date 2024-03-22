@@ -1,7 +1,5 @@
-"use client"
 import React from 'react';
-import { GetServerSideProps, NextPage } from 'next';
-import { useRouter } from 'next/router';
+import { NextPage } from 'next';
 import { Metadata } from 'next';
 
 interface Pokemon {
@@ -18,8 +16,6 @@ export const metadata: Metadata = {
 };
 
 const DetailOfPokemon: NextPage<{ pokemon: Pokemon | null, id: string }> = ({ pokemon, id }) => {
-    const router = useRouter();
-
     if (!pokemon) {
         return <div>Loading...</div>;
     }
@@ -36,7 +32,7 @@ const DetailOfPokemon: NextPage<{ pokemon: Pokemon | null, id: string }> = ({ po
                     <p>types: {pokemon.types.join(", ")}</p>
                     <p>order: {pokemon.order}</p>
                     <div className="card-actions justify-end">
-                        <button className="btn btn-primary" onClick={() => router.push('/client')}>
+                        <button className="btn btn-primary" onClick={() => window.history.back()}>
                             Back
                         </button>
                     </div>
@@ -44,28 +40,6 @@ const DetailOfPokemon: NextPage<{ pokemon: Pokemon | null, id: string }> = ({ po
             </div>
         </div>
     );
-};
-
-export const getServerSideProps: GetServerSideProps = async ({ params }) => {
-    const id = params?.id as string;
-    try {
-        const response = await fetch(`https://pokeapi.co/api/v2/pokemon/${id}/`);
-        if (!response.ok) {
-            throw new Error('Network response was not ok');
-        }
-        const data = await response.json();
-        const pokemon: Pokemon = {
-            name: data.name,
-            height: data.height,
-            weight: data.weight,
-            types: data.types.map((type: { type: { name: string } }) => type.type.name),
-            order: data.order
-        };
-        return { props: { pokemon, id } };
-    } catch (error) {
-        console.error('Error fetching data:', error);
-        return { props: { pokemon: null, id } };
-    }
 };
 
 export default DetailOfPokemon;

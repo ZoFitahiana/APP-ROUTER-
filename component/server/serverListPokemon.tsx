@@ -20,7 +20,7 @@ export default function SimpleSSRComponent(props: Props) {
                         <p>Pokemon number: {getIdFromUrl(pokemon.url)} 🍳</p>
                         <div className="card-actions justify-end">
                             <button className="btn btn-primary">
-                                <a href="/server">Details</a>
+                                <a href={`/server/${getIdFromUrl(pokemon.url)}`}>Details</a>
                             </button>
                         </div>
                     </div>
